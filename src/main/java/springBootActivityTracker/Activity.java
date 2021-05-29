@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Activity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private long aId;
 
     private LocalDateTime startTime;
@@ -30,7 +30,6 @@ public class Activity {
         this.descr = descr;
         this.type = type;
     }
-
 
     public long getaId() {
         return aId;

@@ -19,8 +19,8 @@ public class ActivityWithTrack extends Activity{
     public ActivityWithTrack() {
     }
 
-    public ActivityWithTrack(LocalDateTime startTime, String descr, ActivityType type, int duration){
-        super(startTime, descr, type);
+    public ActivityWithTrack(LocalDateTime startTime, String description, ActivityType type, int duration){
+        super(startTime, description, type);
         this.duration = duration;
     }
 
