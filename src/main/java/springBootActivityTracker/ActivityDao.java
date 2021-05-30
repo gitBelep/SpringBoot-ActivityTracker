@@ -23,6 +23,11 @@ public class ActivityDao {
         return entityManager.find(Activity.class, id);
     }
 
+    public List<Activity> listAllActivities(){
+        return entityManager.createQuery("select a from Activity a order by a.type", Activity.class)
+                .getResultList();
+    }
+
     public Activity findActivityByDescription(String descr){
         return entityManager.createQuery(
                 "select a from Activity a where a.descr = :descr", Activity.class)
@@ -33,20 +38,47 @@ public class ActivityDao {
     public List<Activity> findActivitiesByPartOfDescription(String part){
         String toFind = "%" + part +"%";
         return entityManager.createQuery(
-                "select a from Activity a where a.descr like :descr", Activity.class)
+                "select a from Activity a where a.descr like :descr order by descr desc", Activity.class)
                 .setParameter("descr", toFind)
                 .getResultList();
     }
 
-//    @Transactional
-//    public void saveCoordinates(List<Coordinate> c, ActivityWithTrack w){
-//        for(Coordinate actual : c) {
-//            actual.setCooActivity( w );
-//            w.setWritingTime( LocalDateTime.now() );
-//            entityManager.persist( actual );
-//        }
-//    }
 
+    @Transactional
+    public void saveCoordinates(List<Coordinate> c, long id){
+        ActivityWithTrack w = entityManager.find(ActivityWithTrack.class, id);
+        for(Coordinate actual : c) {
+            actual.setCooActivity( w );
+            entityManager.persist( actual );
+        }
+        w.setWritingTime( LocalDateTime.now() );
+        entityManager.persist( w );             //update writingTime
+    }
 
+    public List<CoordinateDTO> listCoordinateDTOsByLat(double latitude){
+        double latMinus = latitude - 0.01;
+        double latPlus = latitude + 0.01;
+        return entityManager.createQuery(
+                "select new springBootActivityTracker.CoordinateDTO(c.lat, c.lon) from Coordinate c where lat > :lm AND lat < :lp",
+                CoordinateDTO.class)
+                .setParameter("lm", latMinus)
+                .setParameter("lp", latPlus)
+                .getResultList();
+    }
+
+    public List<CoordinateDTO> listCoordnateDTOsAfterDate(LocalDateTime afterThis){
+        return entityManager.createQuery(
+                "select new springBootActivityTracker.CoordinateDTO(c.lat, c.lon) from Coordinate c where c.cooActivity.startTime > :afterDate",
+                CoordinateDTO.class)
+                .setParameter("afterDate", afterThis)
+                .getResultList();
+    }
+
+    public ActivityWithTrack findActivityWithCoordinates(long id){
+        return entityManager.createQuery(
+                "select w from ActivityWithTrack w join fetch w.coordinates where w.id = :id", ActivityWithTrack.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
 
 }
