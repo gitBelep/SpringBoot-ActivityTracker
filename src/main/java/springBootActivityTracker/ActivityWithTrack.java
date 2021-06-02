@@ -12,7 +12,7 @@ public class ActivityWithTrack extends Activity{
 
     private int duration;
 
-    @OneToMany(mappedBy = "cooActivity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cooActivity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Coordinate> coordinates = new ArrayList<>();
 
 

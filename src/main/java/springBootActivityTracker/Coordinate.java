@@ -17,7 +17,7 @@ public class Coordinate {
     private double lon;
 
     @ManyToOne
-    @JoinColumn(name = "aId")
+    @JoinColumn(name = "abcId")
     private  ActivityWithTrack cooActivity;
 
 

@@ -1,5 +1,6 @@
 package springBootActivityTracker;
 
+import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ public class Activity {
 
     private LocalDateTime startTime;
 
+    @UpdateTimestamp
     private LocalDateTime writingTime;
 
     @Column(name="description", nullable = false, length = 200)
@@ -26,8 +28,11 @@ public class Activity {
     }
 
     public Activity(LocalDateTime startTime, String descr, ActivityType type) {
-        this.startTime = startTime;
+        if(descr == null || type == null || "".equals(descr.trim())) {
+            throw new IllegalArgumentException("Provided data must not be epty");
+        }
         this.descr = descr;
+        this.startTime = startTime;
         this.type = type;
     }
 

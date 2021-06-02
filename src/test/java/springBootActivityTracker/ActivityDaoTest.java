@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,7 +55,18 @@ class ActivityDaoTest {
 
     @Test
     void testListAllActivity(){
-        assertEquals(4, dao.listAllActivities().size());
+        assertEquals(4, dao.listAllActivities(0, 30).size());
+
+        List<Activity> activityList = new ArrayList<>();
+        for(int i = 1; i < 100; i++){
+            activityList.add(new Activity(LocalDateTime.now(),""+i,ActivityType.BASKETBALL));
+        }
+        dao.saveActivityList( activityList );
+        List<Activity> returnedActivities = dao.listAllActivities(40, 30);
+
+        assertEquals(30, returnedActivities.size());
+        assertEquals("37", returnedActivities.get(0).getDescr());
+        assertEquals("66", returnedActivities.get(29).getDescr());
     }
 
     @Test
@@ -102,6 +114,27 @@ class ActivityDaoTest {
 
         assertEquals(4, cdl1.size());
         assertEquals(1, cdl2.size());
+    }
+
+    @Test
+    void testDeleteActivityByDate(){
+        List<Activity> returnedActivities1 = dao.listAllActivities(0, 7);
+        assertEquals(4, returnedActivities1.size());
+
+        //Activity            pontos: LocalDateTime.of(2020,1,1,1,1,0)
+        dao.deleteActivityByDate(LocalDateTime.of(2020,1,1,1,0,40));
+        List<Activity> returnedActivities2 = dao.listAllActivities(0, 25);
+        assertEquals(3, returnedActivities2.size());
+
+        //SimpleActivity      pontos: LocalDateTime.of(2019,3,3,3,3,0)
+        dao.deleteActivityByDate(LocalDateTime.of(2019,3,3,3,3,17));
+        List<Activity> returnedActivities4 = dao.listAllActivities(0, 21);
+        assertEquals(2, returnedActivities4.size());
+
+        //ActivityWithTrack   pontos: LocalDateTime.of(2018,2,2,2,2,0)
+        dao.deleteActivityByDate(LocalDateTime.of(2018,2,2,2,2,34));
+        List<Activity> returnedActivities3 = dao.listAllActivities(0, 15);
+        assertEquals(1, returnedActivities3.size());
     }
 
 }
