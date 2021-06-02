@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 //@ExtendWith(SpringExtension.class)   //this is not needed
@@ -74,10 +74,8 @@ class ActivityDaoTest {
         Activity a2 = dao.findActivitiesByPartOfDescription("ima-ő").get(0);
         Activity a3 = dao.findActivitiesByPartOfDescription("mple").get(0);
         List<Activity> myList = dao.findActivitiesByPartOfDescription("-");
-//        for(Activity a : myList) {          //descending?
-//            System.out.println(a.getDescr());
-//        }
 
+        assertEquals("sima-őű", myList.get(2).getDescr());  //descending
         assertEquals(2020, a2.getStartTime().getYear());
         assertEquals("űrben", ((SimpleActivity) a3).getPlace());
         assertEquals(3, myList.size() );
@@ -135,6 +133,19 @@ class ActivityDaoTest {
         dao.deleteActivityByDate(LocalDateTime.of(2018,2,2,2,2,34));
         List<Activity> returnedActivities3 = dao.listAllActivities(0, 15);
         assertEquals(1, returnedActivities3.size());
+    }
+
+    @Test
+    void testChangeDescription(){
+        dao.updateDescr("Új szövegű", 1);
+        assertEquals("Új szövegű", dao.findActivityById(1).getDescr());
+
+        assertThrows(org.springframework.dao.InvalidDataAccessApiUsageException.class,
+                () -> dao.updateDescr("\n", 2));
+
+        Exception ex = assertThrows(org.springframework.dao.InvalidDataAccessApiUsageException.class,
+                () -> dao.updateDescr(null, 2));
+        assertTrue(ex.getMessage().contains("New Text must not be epty"));
     }
 
 }

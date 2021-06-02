@@ -93,6 +93,7 @@ public class ActivityDao {
                 .getSingleResult();
     }
 
+    @Transactional
     public void updateDescr(String updatedText, long id) {
         if (updatedText == null || "".equals(updatedText.trim())) {
             throw new IllegalArgumentException("New Text must not be epty");
